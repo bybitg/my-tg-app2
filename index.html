@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090809">
+<title>CryptoTerminal — Mr Ragnar</title>
+<style>
+:root{--bg:#080809;--panel:rgba(12,11,13,.84);--line:rgba(255,57,65,.6);--red:#ff303b;--muted:#aaa8ae;--green:#00e0ad;--text:#f6f3f4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,Segoe UI,Arial,sans-serif;overflow-x:hidden}
+button,input{font:inherit}button{cursor:pointer}.ambient{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden;background:radial-gradient(ellipse at 25% 40%,rgba(255,0,25,.08),transparent 40%),linear-gradient(90deg,transparent 50%,rgba(0,0,0,.12))}
+.embers{position:fixed;inset:0;pointer-events:none;z-index:4;opacity:.6}
+.layout{min-height:100vh;display:grid;grid-template-columns:minmax(310px,44%) minmax(0,56%);position:relative}
+.hero{position:sticky;top:0;height:100vh;min-height:680px;overflow:hidden;background:#090707}
+.hero-art{position:absolute;inset:-2%;background-image:linear-gradient(0deg,rgba(5,4,5,.95) 0%,transparent 32%,rgba(0,0,0,.05) 65%,rgba(0,0,0,.25) 100%),linear-gradient(90deg,transparent 65%,#090809 100%),url('ragnar-hero.jpg');background-position:center;background-size:cover;animation:heroBreath 13s ease-in-out infinite;transform-origin:50% 45%}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 75%,#080809 100%),radial-gradient(ellipse at 50% 35%,transparent 30%,rgba(0,0,0,.35) 100%);pointer-events:none}
+@keyframes heroBreath{0%,100%{transform:scale(1.02) translateY(0)}50%{transform:scale(1.055) translateY(-.6%)}}
+.moon-glow{position:absolute;top:4%;left:38%;width:220px;height:220px;border-radius:50%;background:rgba(255,24,36,.08);filter:blur(42px);animation:pulse 4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45;transform:scale(.92)}50%{opacity:1;transform:scale(1.12)}}
+.brand{position:absolute;top:25px;left:28px;z-index:2;display:flex;gap:12px;align-items:center;text-shadow:0 2px 12px #000}
+.brand-mark{font-family:Georgia,serif;font-size:42px;font-weight:bold;color:#fff;border-bottom:2px solid var(--red);line-height:1}
+.brand-name{font-size:24px;font-weight:750;letter-spacing:-.7px}.brand-name small{display:block;color:var(--red);font-size:14px;letter-spacing:0;margin-top:1px}
+.profile{position:absolute;bottom:25px;left:24px;z-index:2;display:flex;align-items:center;gap:12px;padding:11px 22px 11px 11px;background:rgba(4,4,5,.8);border:1px solid var(--red);border-radius:50px 8px 8px 50px;box-shadow:0 0 24px #ff18232b;backdrop-filter:blur(10px)}
+.avatar{width:56px;height:56px;border-radius:50%;border:2px solid var(--red);display:grid;place-items:center;font-size:28px;color:#ff858b;background:radial-gradient(circle,#321014,#080809)}
+.profile strong{font-size:17px}.profile small{display:block;color:#bbb}
+.dashboard{padding:18px 22px 20px 0;min-width:0;position:relative;z-index:6}
+.topbar{display:flex;align-items:center;gap:6px;justify-content:space-between;padding:0 2px 16px;border-bottom:1px solid #ffffff18;margin-bottom:18px;flex-wrap:wrap}
+.nav{display:flex;gap:5px;flex-wrap:wrap}.nav button,.theme{color:#bbb;background:transparent;border:1px solid transparent;padding:10px 13px;border-radius:12px}.nav button.active,.nav button:hover{color:white;border-color:#ff333b80;background:linear-gradient(120deg,#ff1d2b25,#080809);box-shadow:0 0 16px #ff24351c}
+.theme{font-size:18px;border-color:#ffffff1b}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:14px}.panel{background:linear-gradient(135deg,rgba(26,24,27,.88),rgba(5,5,7,.9));border:1px solid #ffffff2a;border-radius:16px;padding:16px;position:relative;overflow:hidden;box-shadow:0 12px 35px #0008,inset 0 0 20px #ffffff04;backdrop-filter:blur(12px)}
+.panel:before{content:"";position:absolute;left:0;top:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.85}
+.panel-title{color:#e4e0e2;font-weight:650;font-size:14px;margin-bottom:10px}.total{min-height:180px;background-image:linear-gradient(90deg,rgba(8,8,10,.94),rgba(8,8,10,.58)),url('ragnar-hero.jpg');background-size:cover;background-position:center 35%;border-color:#ff333b75}
+.total-value{font-size:clamp(28px,3vw,44px);letter-spacing:-1.5px;font-weight:650;margin:7px 0}.gain{color:var(--green);font-size:17px;font-weight:700}.mini-stats{display:flex;flex-direction:column;justify-content:center;gap:12px}.stat{padding-bottom:10px;border-bottom:1px solid #ffffff16}.stat:last-child{border:0}.stat label{display:block;color:#aaa;font-size:12px}.stat strong{font-size:20px;color:var(--green)}
+.charts{display:grid;grid-template-columns:1fr 1.25fr;gap:14px;margin-top:14px}.allocation{display:flex;gap:15px;align-items:center;justify-content:center;min-height:170px}.donut{width:116px;height:116px;border-radius:50%;background:conic-gradient(#ff3b22 0 30%,#a37cff 30% 55%,#00d9a4 55% 70%,#4e8cff 70% 79%,#555 79%);position:relative;flex-shrink:0}.donut:after{content:"Портфель";position:absolute;inset:25px;border-radius:50%;background:#101012;display:grid;place-items:center;font-size:12px}.legend{font-size:12px;display:grid;gap:8px;color:#ddd}.legend span{display:flex;align-items:center;gap:7px;justify-content:space-between}.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:3px}
+.chart-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.periods{display:flex;gap:3px}.periods button{background:#242327;border:1px solid #ffffff10;color:#ddd;border-radius:6px;padding:4px 8px;font-size:11px}.periods button.active{background:#8f1119;border-color:#ff303b;color:white}
+canvas{width:100%;height:132px;display:block}.assets{margin-top:14px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:580px}th,td{padding:11px 8px;border-bottom:1px solid #ffffff12;text-align:right;white-space:nowrap}th{color:#aaa;font-weight:500;font-size:12px}th:first-child,td:first-child{text-align:left}td{font-size:13px}.coin{display:inline-flex;align-items:center;gap:8px;font-weight:650}.coin-icon{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;background:#222;font-size:12px}.positive{color:var(--green)}.negative{color:#ff6068}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.action{background:linear-gradient(135deg,#fa2635,#8d101b);border:1px solid #ff6670;color:white;border-radius:8px;padding:9px 13px;box-shadow:0 0 14px #ff1c3025}.ghost{background:#ffffff0a;border:1px solid #ffffff22;color:#ddd;border-radius:8px;padding:8px 12px}
+.footer{display:flex;justify-content:flex-end;align-items:center;gap:12px;color:#bbb;font:italic 13px Georgia,serif;padding:16px 8px}.footer b{color:var(--red)}
+.empty{color:#999;text-align:center;padding:24px 8px}.notice{font-size:12px;color:#999;margin-top:12px}
+.modal{position:fixed;inset:0;background:#000b;z-index:20;display:none;place-items:center;padding:20px}.modal.open{display:grid}.dialog{width:min(460px,100%);background:#111012;border:1px solid #ff3946;border-radius:16px;padding:22px;box-shadow:0 0 50px #ff182322}.dialog h2{margin:0 0 16px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}.field label{color:#bbb;font-size:12px}.field input{width:100%;background:#080809;border:1px solid #ffffff28;border-radius:7px;padding:10px;color:#fff;outline:none}.field input:focus{border-color:#ff303b}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+@media(max-width:1000px){.layout{grid-template-columns:35% 65%}.dashboard{padding-right:12px}.grid{grid-template-columns:1fr}.mini-stats{display:grid;grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}.hero{min-height:650px}.brand-name{font-size:19px}.nav button{padding:8px;font-size:12px}}
+@media(max-width:700px){.layout{display:block}.hero{position:relative;height:56vh;min-height:390px;max-height:560px}.hero-art{background-position:center 35%}.brand{top:16px;left:16px}.profile{bottom:14px;left:14px}.dashboard{padding:14px}.topbar{align-items:flex-start}.nav{width:100%;order:2}.nav button{flex:1}.grid{grid-template-columns:1fr}.charts{grid-template-columns:1fr}.total{min-height:170px}.mini-stats{grid-template-columns:repeat(3,1fr)}.stat strong{font-size:16px}.footer{justify-content:center;flex-wrap:wrap}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="ambient"></div><canvas class="embers" id="embers"></canvas>
+<div class="layout">
+  <aside class="hero" aria-label="Mr Ragnar, тёмный король и волк">
+    <div class="hero-art"></div><div class="moon-glow"></div>
+    <div class="brand"><div class="brand-mark">ℜ</div><div class="brand-name">CryptoTerminal<small>Mr Ragnar</small></div></div>
+    <div class="profile"><div class="avatar">♜</div><div><strong>Mr Ragnar</strong><small>Crypto Investor</small></div></div>
+  </aside>
+  <main class="dashboard">
+    <header class="topbar">
+      <nav class="nav">
+        <button class="active" data-target="portfolio">⌂ Портфель</button>
+        <button data-target="assets">◈ Активы</button>
+        <button data-target="statistics">▥ Статистика</button>
+        <button data-target="history">◴ История</button>
+        <button data-target="settings">⚙ Настройки</button>
+      </nav>
+      <button class="theme" id="exportBtn" title="Экспорт CSV">⇩</button>
+    </header>
+    <section id="portfolio">
+      <div class="grid">
+        <div class="panel total"><div class="panel-title">Общая стоимость портфеля</div><div class="total-value" id="totalValue">$0.00</div><div class="gain" id="totalPnl">Добавь активы, чтобы увидеть результат</div></div>
+        <div class="panel mini-stats">
+          <div class="stat"><label>Активов</label><strong id="assetCount">0</strong></div>
+          <div class="stat"><label>Общая прибыль</label><strong id="profitValue">—</strong></div>
+          <div class="stat"><label>Записей истории</label><strong id="historyCount">0</strong></div>
+        </div>
+      </div>
+      <div class="charts">
+        <div class="panel"><div class="panel-title">Распределение активов</div><div class="allocation"><div class="donut" id="donut"></div><div class="legend" id="legend"><span>Портфель пуст</span></div></div></div>
+        <div class="panel"><div class="chart-head"><div class="panel-title">История стоимости</div><div class="periods"><button class="active" data-period="all">ВСЕ</button><button data-period="snapshots">Снимки</button></div></div><canvas id="historyChart" width="640" height="220"></canvas><div class="notice">График строится по снимкам, которые ты сохраняешь вручную.</div></div>
+      </div>
+    </section>
+    <section class="panel assets" id="assets">
+      <div class="section-head"><div class="panel-title" style="margin:0">Мои активы</div><div style="display:flex;gap:8px"><button class="ghost" id="snapshotBtn">Снимок</button><button class="action" id="addBtn">＋ Добавить актив</button></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Актив</th><th>Количество</th><th>Цена, USD</th><th>Стоимость</th><th>Доля</th><th>P/L</th><th>Действия</th></tr></thead><tbody id="assetRows"></tbody></table></div>
+      <div class="empty" id="emptyState">Портфель пока пуст. Добавь первый актив вручную — реальные балансы не подставляются автоматически.</div>
+    </section>
+    <section class="panel assets" id="history">
+      <div class="section-head"><div class="panel-title" style="margin:0">История снимков</div><button class="ghost" id="clearHistoryBtn">Очистить историю</button></div>
+      <div id="historyList" class="empty">Снимков пока нет.</div>
+    </section>
+    <section class="panel assets" id="statistics">
+      <div class="panel-title">Статистика портфеля</div>
+      <div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+        <div><div class="notice">Текущая стоимость</div><h2 id="statValue">$0.00</h2></div>
+        <div><div class="notice">Вложено по себестоимости</div><h2 id="statCost">$0.00</h2></div>
+        <div><div class="notice">Нереализованный P/L</div><h2 id="statPnl">—</h2></div>
+      </div>
+    </section>
+    <section class="panel assets" id="settings">
+      <div class="panel-title">Настройки</div>
+      <div class="field"><label for="nickname">Имя профиля</label><input id="nickname" value="Mr Ragnar" maxlength="40"></div>
+      <p class="notice">Данные сохраняются в localStorage этого браузера. Они не отправляются на сервер. Не вводи seed-фразы, приватные ключи или пароли.</p>
+      <button class="ghost" id="demoBtn">Загрузить демонстрационные данные</button>
+      <button class="ghost" id="clearBtn">Удалить все активы</button>
+    </section>
+    <footer class="footer">«Побеждает не тот, кто сильнее, а тот, кто умнее» <b>— Mr Ragnar</b></footer>
+  </main>
+</div>
+<div class="modal" id="modal"><form class="dialog" id="assetForm"><h2 id="formTitle">Добавить актив</h2><input type="hidden" id="editId">
+  <div class="form-grid">
+    <div class="field"><label for="assetName">Название</label><input id="assetName" placeholder="Bitcoin" required maxlength="40"></div>
+    <div class="field"><label for="ticker">Тикер</label><input id="ticker" placeholder="BTC" required maxlength="12"></div>
+    <div class="field"><label for="quantity">Количество</label><input id="quantity" type="number" min="0" step="any" required placeholder="0"></div>
+    <div class="field"><label for="price">Текущая цена (USD)</label><input id="price" type="number" min="0" step="any" required placeholder="0"></div>
+    <div class="field full"><label for="cost">Цена покупки за единицу (необязательно)</label><input id="cost" type="number" min="0" step="any" placeholder="Для расчёта P/L"></div>
+  </div><div class="dialog-actions"><button type="button" class="ghost" id="cancelBtn">Отмена</button><button class="action" type="submit">Сохранить</button></div>
+</form></div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const colors=['#ff4b22','#a47cff','#00d9a4','#4d8cff','#85858b','#ffbd44','#f26da8'];
+let assets=[], history=[];
+try{assets=JSON.parse(localStorage.getItem('ct_assets')||'[]');history=JSON.parse(localStorage.getItem('ct_history')||'[]')}catch(e){assets=[];history=[]}
+const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(n||0);
+const fmt=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:8}).format(n||0);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function save(){localStorage.setItem('ct_assets',JSON.stringify(assets));localStorage.setItem('ct_history',JSON.stringify(history))}
+function totals(){let value=0,cost=0;assets.forEach(a=>{value+=a.qty*a.price;if(a.cost>0)cost+=a.qty*a.cost});return{value,cost,pnl:cost?value-cost:null}}
+function render(){
+ const t=totals();$('#totalValue').textContent=money(t.value);$('#totalPnl').textContent=t.pnl===null?(assets.length?'Укажи цену покупки, чтобы рассчитать P/L':'Добавь активы, чтобы увидеть результат'):`${t.pnl>=0?'▲ +':'▼ '}${money(Math.abs(t.pnl))} (${t.pnl>=0?'+':''}${(t.cost? t.pnl/t.cost*100:0).toFixed(2)}%)`;
+ $('#assetCount').textContent=assets.length;$('#profitValue').textContent=t.pnl===null?'—':(t.pnl>=0?'+':'')+money(t.pnl);$('#historyCount').textContent=history.length;
+ $('#statValue').textContent=money(t.value);$('#statCost').textContent=money(t.cost);$('#statPnl').textContent=t.pnl===null?'—':(t.pnl>=0?'+':'')+money(t.pnl);
+ $('#emptyState').style.display=assets.length?'none':'block';
+ $('#assetRows').innerHTML=assets.map((a,i)=>{let v=a.qty*a.price,share=t.value?v/t.value*100:0,p=a.cost>0?(a.price-a.cost)*a.qty:null;return `<tr><td><span class="coin"><span class="coin-icon" style="color:${colors[i%colors.length]}">${esc(a.ticker.slice(0,1))}</span>${esc(a.ticker)} <span style="color:#999;font-weight:400">${esc(a.name)}</span></span></td><td>${fmt(a.qty)}</td><td>${money(a.price)}</td><td>${money(v)}</td><td>${share.toFixed(2)}%</td><td class="${p===null?'':p>=0?'positive':'negative'}">${p===null?'—':(p>=0?'+':'')+money(p)}</td><td><button class="ghost" data-edit="${a.id}">Изм.</button> <button class="ghost" data-delete="${a.id}">×</button></td></tr>`}).join('');
+ $('#assetRows').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editAsset(b.dataset.edit));
+ $('#assetRows').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{assets=assets.filter(a=>a.id!==b.dataset.delete);save();render()});
+ renderDonut(t.value);renderChart();renderHistory();
+}
+function renderDonut(total){if(!assets.length||!total){$('#donut').style.background='#333';$('#legend').innerHTML='<span>Портфель пуст</span>';return}
+ let cursor=0,stops=[];assets.forEach((a,i)=>{let p=a.qty*a.price/total*100;stops.push(`${colors[i%colors.length]} ${cursor}% ${cursor+p}%`);cursor+=p});
+ $('#donut').style.background=`conic-gradient(${stops.join(',')})`;
+ $('#legend').innerHTML=assets.map((a,i)=>`<span><span><i class="dot" style="background:${colors[i%colors.length]}"></i>${esc(a.ticker)}</span><b>${(a.qty*a.price/total*100).toFixed(1)}%</b></span>`).join('');
+}
+function renderChart(){const c=$('#historyChart'),ctx=c.getContext('2d'),r=c.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=Math.max(320,r.width*dpr);c.height=150*dpr;ctx.scale(dpr,dpr);let W=c.width/dpr,H=150;ctx.clearRect(0,0,W,H);ctx.strokeStyle='#ffffff18';ctx.lineWidth=1;for(let y=18;y<H;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+ let vals=history.map(x=>x.value);if(vals.length<2){ctx.fillStyle='#8f898f';ctx.font='12px Arial';ctx.textAlign='center';ctx.fillText(vals.length?'Сохрани ещё один снимок, чтобы увидеть динамику':'Здесь появится график истории портфеля',W/2,H/2);return}
+ let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min*=.95;max*=1.05}let pts=vals.map((v,i)=>({x:8+i*(W-16)/(vals.length-1),y:H-12-(v-min)/(max-min)*(H-32)}));
+ let gr=ctx.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#ff303b66');gr.addColorStop(1,'#ff303b00');ctx.beginPath();ctx.moveTo(pts[0].x,H-10);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(pts.at(-1).x,H-10);ctx.closePath();ctx.fillStyle=gr;ctx.fill();
+ ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.strokeStyle='#ff303b';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#ff515b';pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,2.5,0,Math.PI*2);ctx.fill()});
+}
+function renderHistory(){if(!history.length){$('#historyList').textContent='Снимков пока нет.';return}$('#historyList').innerHTML=[...history].reverse().map(h=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:10px;border-bottom:1px solid #ffffff12"><span>${new Date(h.date).toLocaleString('ru-RU')}</span><b>${money(h.value)}</b></div>`).join('')}
+function openModal(){ $('#modal').classList.add('open');$('#assetName').focus() }function closeModal(){$('#modal').classList.remove('open');$('#assetForm').reset();$('#editId').value='';$('#formTitle').textContent='Добавить актив'}
+function editAsset(id){let a=assets.find(x=>x.id===id);if(!a)return;$('#formTitle').textContent='Изменить актив';$('#editId').value=id;$('#assetName').value=a.name;$('#ticker').value=a.ticker;$('#quantity').value=a.qty;$('#price').value=a.price;$('#cost').value=a.cost||'';openModal()}
+$('#addBtn').onclick=()=>{closeModal();openModal()};$('#cancelBtn').onclick=closeModal;$('#modal').onclick=e=>{if(e.target===$('#modal'))closeModal()};
+$('#assetForm').onsubmit=e=>{e.preventDefault();let id=$('#editId').value;let a={id:id||crypto.randomUUID(),name:$('#assetName').value.trim(),ticker:$('#ticker').value.trim().toUpperCase(),qty:Number($('#quantity').value),price:Number($('#price').value),cost:Number($('#cost').value)||0};if(id)assets=assets.map(x=>x.id===id?a:x);else assets.push(a);save();closeModal();render()};
+$('#snapshotBtn').onclick=()=>{if(!assets.length){alert('Сначала добавь хотя бы один актив.');return}history.push({date:new Date().toISOString(),value:totals().value});save();render()};
+$('#clearHistoryBtn').onclick=()=>{if(confirm('Удалить все снимки истории?')){history=[];save();render()}};
+$('#clearBtn').onclick=()=>{if(confirm('Удалить все активы из локального портфеля?')){assets=[];save();render()}};
+$('#exportBtn').onclick=()=>{let rows=[['Название','Тикер','Количество','Цена USD','Стоимость USD','Цена покупки USD'],...assets.map(a=>[a.name,a.ticker,a.qty,a.price,a.qty*a.price,a.cost])];let csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\r\n');let url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));let a=document.createElement('a');a.href=url;a.download='cryptoterminal-portfolio.csv';a.click();URL.revokeObjectURL(url)};
+$('#nickname').oninput=e=>{$$('.brand-name small').forEach(x=>x.textContent=e.target.value||'Mr Ragnar');$('.profile strong').textContent=e.target.value||'Mr Ragnar'};
+$('#demoBtn').onclick=()=>{if(!confirm('Загрузить демонстрационные активы? Текущие активы будут заменены.'))return;assets=[{id:crypto.randomUUID(),name:'Bitcoin',ticker:'BTC',qty:0.5,price:56000,cost:52000},{id:crypto.randomUUID(),name:'Ethereum',ticker:'ETH',qty:4,price:3120,cost:2800},{id:crypto.randomUUID(),name:'Solana',ticker:'SOL',qty:12,price:112,cost:95}];history=[{date:new Date(Date.now()-86400000*3).toISOString(),value:assets.reduce((s,a)=>s+a.qty*a.cost,0)},{date:new Date().toISOString(),value:assets.reduce((s,a)=>s+a.qty*a.price,0)}];save();render()};
+$$('.nav button').forEach(b=>b.onclick=()=>{ $$('.nav button').forEach(x=>x.classList.toggle('active',x===b));document.getElementById(b.dataset.target).scrollIntoView({behavior:'smooth',block:'start'})});
+$$('[data-period]').forEach(b=>b.onclick=()=>{$$('[data-period]').forEach(x=>x.classList.toggle('active',x===b));renderChart()});
+window.addEventListener('resize',renderChart);
+function particles(){const c=$('#embers'),ctx=c.getContext('2d');let W,H,ps=[];function resize(){W=c.width=innerWidth;H=c.height=innerHeight;ps=Array.from({length:Math.min(100,Math.floor(W/16))},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.8+.4,v:Math.random()*.45+.12,a:Math.random()*.65+.15}))}function frame(){ctx.clearRect(0,0,W,H);ps.forEach(p=>{p.y-=p.v;p.x+=Math.sin(p.y*.01)*.25;if(p.y<0){p.y=H;p.x=Math.random()*W}ctx.beginPath();ctx.fillStyle=`rgba(255,${45+Math.floor(p.a*70)},${35+Math.floor(p.a*30)},${p.a})`;ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()});requestAnimationFrame(frame)}resize();window.addEventListener('resize',resize);frame()}particles();render();
+</script>
+</body>
+</html>
